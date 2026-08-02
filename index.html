@@ -135,8 +135,11 @@
   .concerts-band{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
   .concert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
   .concert-card{
-    background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:20px;
+    background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;
   }
+  .concert-card .thumb{aspect-ratio:16/10;overflow:hidden;background:var(--line);}
+  .concert-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .concert-card .body{padding:20px;}
   .concert-card .date{font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--navy-deep);font-weight:700;}
   .concert-card h4{font-family:'Playfair Display',serif;font-size:1.15rem;margin:8px 0 4px;color:var(--ink);}
   .concert-card .venue{color:var(--soft);font-size:0.85rem;margin-bottom:14px;}
@@ -217,7 +220,7 @@
       </div>
     </div>
     <div class="hero-photo">
-      <img src="assets/images/sm-17.jpg" alt="Stevie Macs Mini Bus">
+      <img src="assets/images/sm-01.jpg" alt="Stevie Macs Mini Bus">
     </div>
   </div>
 </header>
@@ -405,16 +408,17 @@
   });
 
   // ---- Concert transport: auto-updating list ----
-  // Add one line per gig (artist, venue, city, date). Past shows drop off automatically,
-  // and price is set by the city rule below rather than typed by hand.
+  // Add one line per gig (artist, venue, city, date, image). Past shows drop off automatically,
+  // price is set by the city rule below rather than typed by hand, and if an image is
+  // missing or fails to load the card falls back to the logo rather than breaking.
   const CITY_FARES = { "Glasgow": 15, "Edinburgh": 30 };
 
   const CONCERTS = [
-    { artist: "Chris Stapleton", venue: "OVO Hydro", city: "Glasgow", date: "2026-08-14" },
-    { artist: "Take That",       venue: "OVO Hydro", city: "Glasgow", date: "2026-09-02" },
-    { artist: "Bon Jovi",        venue: "Murrayfield Stadium", city: "Edinburgh", date: "2026-09-19" },
-    { artist: "Metallica",       venue: "OVO Hydro", city: "Glasgow", date: "2026-10-04" },
-    { artist: "Teddy Swims",     venue: "OVO Hydro", city: "Glasgow", date: "2026-05-01" }
+    { artist: "Chris Stapleton", venue: "OVO Hydro", city: "Glasgow", date: "2026-08-14", image: "assets/images/chris-stapleton.jpg" },
+    { artist: "Take That",       venue: "OVO Hydro", city: "Glasgow", date: "2026-09-02", image: "assets/images/take-that.jpg" },
+    { artist: "Bon Jovi",        venue: "Murrayfield Stadium", city: "Edinburgh", date: "2026-09-19", image: "assets/images/bon-jovi.jpg" },
+    { artist: "Metallica",       venue: "OVO Hydro", city: "Glasgow", date: "2026-10-04", image: "assets/images/metallica.jpg" },
+    { artist: "Teddy Swims",     venue: "OVO Hydro", city: "Glasgow", date: "2026-05-01", image: "assets/images/teddy-swims.jpg" }
   ];
 
   function renderConcerts(){
@@ -438,14 +442,21 @@
       const fare = CITY_FARES[c.city];
       const priceStr = fare ? `£${fare}pp return` : 'Message for price';
       const waText = encodeURIComponent(`Hi, I'd like to book minibus transport for ${c.artist} on ${dateStr}`);
+      const imgSrc = c.image || 'assets/images/sm-logo.png';
       return `
         <div class="concert-card">
-          <div class="date">${dateStr}</div>
-          <h4>${c.artist}</h4>
-          <div class="venue">${c.venue}, ${c.city}</div>
-          <div class="row">
-            <span class="price">${priceStr}</span>
-            <a class="book" href="https://wa.me/447715687055?text=${waText}">Book This Trip →</a>
+          <div class="thumb">
+            <img src="${imgSrc}" alt="${c.artist}" loading="lazy"
+                 onerror="this.onerror=null;this.src='assets/images/sm-logo.png';this.style.objectFit='contain';this.style.padding='20px';">
+          </div>
+          <div class="body">
+            <div class="date">${dateStr}</div>
+            <h4>${c.artist}</h4>
+            <div class="venue">${c.venue}, ${c.city}</div>
+            <div class="row">
+              <span class="price">${priceStr}</span>
+              <a class="book" href="https://wa.me/447715687055?text=${waText}">Book This Trip →</a>
+            </div>
           </div>
         </div>`;
     }).join('');
