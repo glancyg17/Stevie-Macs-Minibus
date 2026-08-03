@@ -191,21 +191,56 @@
 
   /* CONCERTS */
   .concerts-band{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-  .concert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  .concert-card{
-    background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  .venue-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start;}
+  .venue-col{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .venue-head{padding:18px 18px 14px;border-bottom:1px solid var(--line);}
+  .venue-head h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);}
+  .venue-head .venue-meta{font-size:0.76rem;color:var(--soft);margin-top:2px;}
+
+  .feature-show{
+    display:flex;flex-direction:column;justify-content:flex-end;min-height:170px;
+    background:var(--navy-deep);background-size:cover;background-position:center;
+    color:var(--white);padding:18px;border-bottom:1px solid var(--line);
   }
-  .concert-card .thumb{aspect-ratio:16/10;overflow:hidden;background:var(--line);}
-  .concert-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .concert-card .body{padding:20px;}
-  .concert-card .date{font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--navy-deep);font-weight:700;}
-  .concert-card h4{font-family:'Playfair Display',serif;font-size:1.15rem;margin:8px 0 4px;color:var(--ink);}
-  .concert-card .venue{color:var(--soft);font-size:0.85rem;margin-bottom:14px;}
-  .concert-card .row{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--line);padding-top:12px;}
-  .concert-card .price{font-weight:700;color:var(--ink);}
-  .concert-card .book{font-size:0.82rem;font-weight:600;color:var(--navy-deep);}
+  .feature-eyebrow{font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--navy-light);font-weight:700;margin-bottom:8px;}
+  .feature-date{font-family:'IBM Plex Mono',monospace,'Poppins';font-size:0.76rem;color:#C7CBD1;margin-bottom:4px;}
+  .feature-artist{font-family:'Playfair Display',serif;font-size:1.25rem;line-height:1.15;margin-bottom:4px;}
+  .feature-venue{font-size:0.78rem;color:#C7CBD1;margin-bottom:10px;}
+  .feature-cta{font-size:0.8rem;font-weight:600;color:var(--white);display:flex;align-items:center;gap:6px;margin-top:6px;}
+
+  .show-list{list-style:none;}
+  .show-list li{border-bottom:1px solid var(--line);}
+  .show-list li:last-child{border-bottom:none;}
+  .show-list a{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:12px 18px;font-size:0.86rem;color:var(--ink);
+  }
+  .show-list a:hover{background:var(--white);}
+  .show-list .show-date{color:var(--soft);font-size:0.76rem;flex-shrink:0;}
+  .show-list .show-artist{font-weight:600;flex:1;text-align:left;padding:0 10px;}
+  .show-list .show-venue{display:block;font-weight:400;color:var(--soft);font-size:0.74rem;margin-top:2px;}
+  .show-list .show-arrow{color:var(--navy-deep);font-weight:700;flex-shrink:0;}
+  .show-list .show-price{color:var(--navy-deep);font-weight:600;font-size:0.76rem;flex-shrink:0;text-align:right;}
+  .venue-more-msg{padding:14px 18px;color:var(--soft);font-size:0.82rem;}
+
+  .load-more-row button{
+    width:100%;padding:12px 18px;background:none;border:none;text-align:left;
+    font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;color:var(--navy-deep);cursor:pointer;
+  }
+  .load-more-row button:hover{background:var(--white);}
+  .show-hidden{display:none;}
+
+  .venue-empty{padding:18px;color:var(--soft);font-size:0.86rem;}
+
   .concerts-empty{text-align:center;color:var(--soft);padding:20px;font-size:0.94rem;}
   .concerts-note{text-align:center;color:var(--soft);font-size:0.8rem;margin-top:22px;}
+
+  .concert-cta{
+    max-width:680px;margin:36px auto 0;text-align:center;background:var(--white);
+    border:1px dashed var(--navy-light);border-radius:8px;padding:26px 24px;
+  }
+  .concert-cta p{color:var(--soft);font-size:0.92rem;margin-bottom:16px;}
+
 
   /* REVIEWS */
   .review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
@@ -242,7 +277,7 @@
     .hero-carousel-item{width:84%;}
     .hero-carousel-item.slot-left{transform:translate(-118%,10%) scale(0.72) rotate(-9deg);}
     .hero-carousel-item.slot-right{transform:translate(34%,10%) scale(0.72) rotate(9deg);}
-    .service-grid,.concert-grid,.review-grid{grid-template-columns:1fr;}
+    .service-grid,.venue-grid,.review-grid{grid-template-columns:1fr;}
     .gallery-grid{grid-template-columns:repeat(2,1fr);}
     .nav-call{display:none!important;}
     .hero h1{font-size:2.1rem;}
@@ -358,8 +393,11 @@
       <h2>Upcoming shows we're running for.</h2>
       <p>Fares are set automatically by venue — Glasgow gigs from £15pp return, Edinburgh from £30pp return.</p>
     </div>
-    <div id="concert-grid" class="concert-grid"></div>
-    <div id="concert-empty" class="concerts-empty" style="display:none;">No shows on the board right now — new dates go up as soon as they're announced. Message us and we'll let you know what's coming up.</div>
+    <div id="venue-grid" class="venue-grid"></div>
+    <div class="concert-cta">
+      <p>Playing somewhere else, or don't see your show above? We'll still get you there.</p>
+      <a href="https://wa.me/447715687055?text=Hi%2C%20I%27d%20like%20to%20book%20minibus%20transport%20for%20a%20concert%20not%20listed%20on%20your%20site" class="btn-primary">Ask About Your Show</a>
+    </div>
     <p class="concerts-note">Pickups from Hamilton Bus Station, Motherwell Train Station and Angels Uddingston.</p>
   </div>
 </section>
@@ -511,62 +549,155 @@
     if(e.key === 'ArrowLeft') showPrev();
   });
 
-  // ---- Concert transport: auto-updating list ----
-  // Add one line per gig (artist, venue, city, date, image). Past shows drop off automatically,
-  // price is set by the city rule below rather than typed by hand, and if an image is
-  // missing or fails to load the card falls back to the logo rather than breaking.
+  // ---- Concert transport: 3 columns, feature show + capped list ----
+  // Dates checked against each venue's own listings as of Aug 2026 — do not add a date here
+  // unless it's genuinely confirmed. 'mode: single' columns (Hydro, Hampden) assume one venue/city
+  // so price is set once for the whole column. 'mode: mixed' (Other Events) spans multiple venues/
+  // cities, so each entry carries its own venueName + city, and price shows "Message for price"
+  // where there's no established flat rate for that city. Past shows drop off automatically,
+  // and each column caps its list at 7 rows with a "Load more" line revealing the rest.
+  const VENUES = [
+    { key: 'hydro',   name: 'OVO Hydro',    city: 'Glasgow', mode: 'single' },
+    { key: 'other',   name: 'Other Events', mode: 'mixed' },
+    { key: 'hampden', name: 'Hampden Park', city: 'Glasgow', mode: 'single' }
+  ];
   const CITY_FARES = { "Glasgow": 15, "Edinburgh": 30 };
+  const LIST_CAP = 7;
 
   const CONCERTS = [
-    { artist: "Chris Stapleton", venue: "OVO Hydro", city: "Glasgow", date: "2026-08-14", image: "assets/images/chris-stapleton.jpg" },
-    { artist: "Take That",       venue: "OVO Hydro", city: "Glasgow", date: "2026-09-02", image: "assets/images/take-that.jpg" },
-    { artist: "Bon Jovi",        venue: "Murrayfield Stadium", city: "Edinburgh", date: "2026-09-19", image: "assets/images/bon-jovi.jpg" },
-    { artist: "Metallica",       venue: "OVO Hydro", city: "Glasgow", date: "2026-10-04", image: "assets/images/metallica.jpg" },
-    { artist: "Teddy Swims",     venue: "OVO Hydro", city: "Glasgow", date: "2026-05-01", image: "assets/images/teddy-swims.jpg" }
+    { artist: "Hollywood Vampires",               venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-08-17", image: "assets/images/hollywoodvampires.jpg" },
+    { artist: "AEW: Dynamite & Collision",         venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-08-26" },
+    { artist: "The Waterboys: Fisherman's Blues Revue", venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-08-29" },
+    { artist: "The Neighbourhood",                 venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-02" },
+    { artist: "A$AP Rocky",                        venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-04" },
+    { artist: "André Rieu",                        venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-10" },
+    { artist: "Kevin Bridges: Here If You Need Me", venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-11" },
+    { artist: "Hilary Duff",                       venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-13" },
+    { artist: "Tide Lines",                        venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-19" },
+    { artist: "Two Doors Down",                    venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-25" },
+    { artist: "Niall Horan",                       venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-09-28" },
+
+    { artist: "Bon Jovi: Forever Tour",            venueKey: "other", venueName: "Murrayfield Stadium, Edinburgh", city: "Edinburgh", date: "2026-08-28", image: "assets/images/bon-jovi.jpg", featured: true },
+    { artist: "Edinburgh International Festival",  venueKey: "other", venueName: "Venues across Edinburgh (7–30 Aug)", city: "Edinburgh", date: "2026-08-07" },
+    { artist: "Florence + The Machine",            venueKey: "other", venueName: "Royal Highland Showground, Edinburgh", city: "Edinburgh", date: "2026-08-24" },
+    { artist: "McFly: Summer Nights on the Southside", venueKey: "other", venueName: "Queen's Park Recreation Ground, Glasgow", city: "Glasgow", date: "2026-08-27" },
+    { artist: "Scissor Sisters: Summer Nights on the Southside", venueKey: "other", venueName: "Queen's Park Recreation Ground, Glasgow", city: "Glasgow", date: "2026-08-30" },
+    { artist: "Jane McDonald: Living The Dream",   venueKey: "other", venueName: "P&J Live, Aberdeen", city: "Aberdeen", date: "2026-09-02" },
+    { artist: "Westlife: 25 – The Anniversary World Tour", venueKey: "other", venueName: "P&J Live, Aberdeen", city: "Aberdeen", date: "2026-09-29" },
+    { artist: "The Australian Pink Floyd",         venueKey: "other", venueName: "P&J Live, Aberdeen", city: "Aberdeen", date: "2026-10-30" },
+
+    { artist: "Scotland vs Switzerland — UEFA Nations League",    venueKey: "hampden", venueName: "Hampden Park", city: "Glasgow", date: "2026-09-29", image: "assets/images/scotvswitz.jpg" },
+    { artist: "Scotland vs Slovenia — UEFA Nations League",       venueKey: "hampden", venueName: "Hampden Park", city: "Glasgow", date: "2026-10-06" },
+    { artist: "Scotland vs North Macedonia — UEFA Nations League", venueKey: "hampden", venueName: "Hampden Park", city: "Glasgow", date: "2026-11-13" }
   ];
 
-  function renderConcerts(){
-    const grid = document.getElementById('concert-grid');
-    const empty = document.getElementById('concert-empty');
-    const today = new Date(); today.setHours(0,0,0,0);
-
-    const upcoming = CONCERTS
-      .filter(c => new Date(c.date) >= today)
-      .sort((a,b) => new Date(a.date) - new Date(b.date));
-
-    if(upcoming.length === 0){
-      grid.style.display = 'none';
-      empty.style.display = 'block';
-      return;
-    }
-
-    grid.innerHTML = upcoming.map(c => {
-      const d = new Date(c.date);
-      const dateStr = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-      const fare = CITY_FARES[c.city];
-      const priceStr = fare ? `£${fare}pp return` : 'Message for price';
-      const waText = encodeURIComponent(`Hi, I'd like to book minibus transport for ${c.artist} on ${dateStr}`);
-      const imgSrc = c.image || 'assets/images/sm-logo.png';
-      return `
-        <div class="concert-card">
-          <div class="thumb">
-            <img src="${imgSrc}" alt="${c.artist}" loading="lazy"
-                 onerror="this.onerror=null;this.src='assets/images/sm-logo.png';this.style.objectFit='contain';this.style.padding='20px';">
-          </div>
-          <div class="body">
-            <div class="date">${dateStr}</div>
-            <h4>${c.artist}</h4>
-            <div class="venue">${c.venue}, ${c.city}</div>
-            <div class="row">
-              <span class="price">${priceStr}</span>
-              <a class="book" href="https://wa.me/447715687055?text=${waText}">Book This Trip →</a>
-            </div>
-          </div>
-        </div>`;
-    }).join('');
+  function formatShowDate(dateStr){
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function showWaLink(artist, dateStr, venueName){
+    const text = encodeURIComponent(`Hi, I'd like to check availability for ${artist} at ${venueName} on ${formatShowDate(dateStr)}`);
+    return `https://wa.me/447715687055?text=${text}`;
+  }
+  function priceStrFor(city){
+    const fare = CITY_FARES[city];
+    return fare ? `£${fare}pp return` : 'Message for price';
   }
 
-  renderConcerts();
+  function renderVenues(){
+    const grid = document.getElementById('venue-grid');
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+
+    grid.innerHTML = VENUES.map(venue => {
+      const shows = CONCERTS
+        .filter(c => c.venueKey === venue.key && new Date(c.date) >= today)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const metaStr = venue.mode === 'single'
+        ? `${venue.city} · ${priceStrFor(venue.city)}`
+        : 'Across Scotland · price on request';
+
+      if(shows.length === 0){
+        return `
+          <div class="venue-col">
+            <div class="venue-head"><h3>${venue.name}</h3><div class="venue-meta">${metaStr}</div></div>
+            <div class="venue-empty">No shows booked in yet for ${venue.name} — message us and we'll keep you posted.</div>
+          </div>`;
+      }
+
+      let feature, rest;
+      if(venue.mode === 'mixed'){
+        feature = shows.find(c => c.featured) || shows[0];
+        rest = shows.filter(c => c !== feature);
+      } else {
+        [feature, ...rest] = shows;
+      }
+      const visible = rest.slice(0, LIST_CAP);
+      const hidden = rest.slice(LIST_CAP);
+
+      const featureBg = feature.image
+        ? ` style="background-image:linear-gradient(180deg, rgba(21,22,26,0.15) 0%, rgba(21,22,26,0.92) 85%), url('${feature.image}');"`
+        : '';
+      const featureVenueLine = venue.mode === 'mixed'
+        ? `<div class="feature-venue">${feature.venueName} · ${priceStrFor(feature.city)}</div>`
+        : '';
+      const featureEyebrow = venue.mode === 'mixed' ? 'Featured' : 'Next up';
+
+      const featureHtml = `
+        <a class="feature-show" href="${showWaLink(feature.artist, feature.date, feature.venueName)}"${featureBg}>
+          <div class="feature-eyebrow">${featureEyebrow}</div>
+          <div class="feature-date">${formatShowDate(feature.date)}</div>
+          <div class="feature-artist">${feature.artist}</div>
+          ${featureVenueLine}
+          <div class="feature-cta">Check availability →</div>
+        </a>`;
+
+      const rowHtml = c => {
+        if(venue.mode === 'mixed'){
+          return `
+            <li><a href="${showWaLink(c.artist, c.date, c.venueName)}">
+              <span class="show-date">${formatShowDate(c.date)}</span>
+              <span class="show-artist">${c.artist}<small class="show-venue">${c.venueName}</small></span>
+              <span class="show-price">${priceStrFor(c.city)}</span>
+            </a></li>`;
+        }
+        return `
+          <li><a href="${showWaLink(c.artist, c.date, c.venueName)}">
+            <span class="show-date">${formatShowDate(c.date)}</span>
+            <span class="show-artist">${c.artist}</span>
+            <span class="show-arrow">→</span>
+          </a></li>`;
+      };
+
+      let listBodyHtml;
+      if(rest.length === 0){
+        listBodyHtml = `<li class="venue-more-msg">More ${venue.name} dates to follow — message us and we'll keep you posted.</li>`;
+      } else {
+        const visibleHtml = visible.map(rowHtml).join('');
+        const hiddenHtml = hidden.map(c => rowHtml(c).replace('<li>', '<li class="show-hidden">')).join('');
+        const loadMoreHtml = hidden.length > 0
+          ? `<li class="load-more-row"><button type="button" data-action="load-more">Load ${hidden.length} more show${hidden.length > 1 ? 's' : ''}</button></li>`
+          : '';
+        listBodyHtml = `${visibleHtml}${hiddenHtml}${loadMoreHtml}`;
+      }
+
+      return `
+        <div class="venue-col">
+          <div class="venue-head"><h3>${venue.name}</h3><div class="venue-meta">${metaStr}</div></div>
+          ${featureHtml}
+          <ul class="show-list">${listBodyHtml}</ul>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('[data-action="load-more"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const list = btn.closest('.show-list');
+        list.querySelectorAll('.show-hidden').forEach(li => li.classList.remove('show-hidden'));
+        btn.closest('.load-more-row').remove();
+      });
+    });
+  }
+
+  renderVenues();
 </script>
 
 </body>
