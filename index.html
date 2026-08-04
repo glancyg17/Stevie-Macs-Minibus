@@ -87,7 +87,7 @@
 
   /* HERO */
   .hero{padding:64px 0 56px;}
-  .hero .wrap{display:grid;grid-template-columns:1.1fr 0.9fr;gap:52px;align-items:center;}
+  .hero .wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
   .eyebrow{
     font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--navy-deep);
     font-weight:700;margin-bottom:16px;
@@ -102,10 +102,10 @@
   .trust-line span::before{content:"✓";color:var(--navy-deep);font-weight:700;}
   /* HERO CAROUSEL — three photos on an arc, centre one focused, rotating every 2.7s */
   .hero-carousel{
-    position:relative;aspect-ratio:20/9;overflow:visible;
+    position:relative;aspect-ratio:40/21;overflow:hidden;border-radius:10px;
   }
   .hero-carousel-item{
-    position:absolute;top:0;left:50%;width:60%;aspect-ratio:4/3;
+    position:absolute;top:0;left:50%;width:70%;aspect-ratio:4/3;
     border-radius:10px;overflow:hidden;
     box-shadow:0 20px 36px -14px rgba(21,22,26,0.32);
     transition:transform 1s cubic-bezier(.65,0,.35,1), opacity 1s ease, filter 1s ease, z-index 0s 0.5s;
@@ -116,11 +116,11 @@
     z-index:3;opacity:1;filter:brightness(1) saturate(1);
   }
   .hero-carousel-item.slot-left{
-    transform:translate(-168%,12%) scale(0.7) rotate(-10deg);
+    transform:translate(-98%,10%) scale(0.72) rotate(-9deg);
     z-index:2;opacity:0.8;filter:brightness(0.82) saturate(0.92);
   }
   .hero-carousel-item.slot-right{
-    transform:translate(68%,12%) scale(0.7) rotate(10deg);
+    transform:translate(28%,10%) scale(0.72) rotate(9deg);
     z-index:2;opacity:0.8;filter:brightness(0.82) saturate(0.92);
   }
 
