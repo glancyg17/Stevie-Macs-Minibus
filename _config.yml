@@ -1,0 +1,5 @@
+# Keep repo-only files out of the published site
+exclude:
+  - CLAUDE.md
+  - README.md
+  - docs/
