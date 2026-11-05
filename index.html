@@ -564,7 +564,14 @@
   const CITY_FARES = { "Glasgow": 15, "Edinburgh": 30 };
   const LIST_CAP = 7;
 
-  const CONCERTS = [
+  // The client manages shows at /admin/ (Supabase). The public page only READS with the publishable key;
+  // row-level security means that key can't write anything. Not secret by design.
+  const SB_URL = 'https://vdlxjdhbwtcildvxfvxm.supabase.co';
+  const SB_KEY = 'sb_publishable_anjGUMcHq6xB4oIIhvuPFQ_40ccOn8t';
+  const SB_SITE_ID = '02dfb9d4-86e1-4aad-aea2-5bc9b05e10e7';
+
+  // Fallback only: used if Supabase can't be reached. The live list is the `concerts` table (edited at /admin/).
+  const FALLBACK_CONCERTS = [
     { artist: "Hollywood Vampires",               venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-08-17", image: "assets/images/hollywoodvampires.jpg" },
     { artist: "AEW: Dynamite & Collision",         venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-08-26" },
     { artist: "The Waterboys: Fisherman's Blues Revue", venueKey: "hydro", venueName: "OVO Hydro", city: "Glasgow", date: "2026-08-29" },
@@ -594,21 +601,54 @@
   function formatShowDate(dateStr){
     return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }
+  function esc(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
   function showWaLink(artist, dateStr, venueName){
-    const text = encodeURIComponent(`Hi, I'd like to check availability for ${artist} at ${venueName} on ${formatShowDate(dateStr)}`);
+    const where = venueName ? ` at ${venueName}` : '';
+    const text = encodeURIComponent(`Hi, I'd like to check availability for ${artist}${where} on ${formatShowDate(dateStr)}`);
     return `https://wa.me/447715687055?text=${text}`;
+  }
+
+  // ---- Reading shows from Supabase (managed by the client at /admin/) ----
+  async function loadConcerts(){
+    try {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 6000);
+      const url = `${SB_URL}/rest/v1/concerts?site_id=eq.${SB_SITE_ID}&select=title,show_date,venue_key,venue_name,city,featured,image_path&order=show_date.asc`;
+      const res = await fetch(url, { headers: { apikey: SB_KEY }, signal: ctl.signal });
+      clearTimeout(timer);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const rows = await res.json();
+      if(!Array.isArray(rows)) throw new Error('unexpected response');
+      const img = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.jpg$/;
+      return rows.map(r => {
+        const v = VENUES.find(x => x.key === r.venue_key) || VENUES.find(x => x.key === 'other');
+        const single = v.mode === 'single';
+        return {
+          artist: r.title, date: r.show_date, venueKey: v.key,
+          venueName: single ? v.name : (r.venue_name || ''),
+          city: single ? v.city : (r.city || ''),
+          image: r.image_path && img.test(r.image_path) ? `${SB_URL}/storage/v1/object/public/site-images/${r.image_path}` : '',
+          featured: !!r.featured
+        };
+      });
+    } catch(err){
+      console.warn('Shows unavailable, using fallback list:', err);
+      return FALLBACK_CONCERTS;
+    }
   }
   function priceStrFor(city){
     const fare = CITY_FARES[city];
     return fare ? `£${fare}pp return` : 'Message for price';
   }
 
-  function renderVenues(){
+  function renderVenues(concerts){
     const grid = document.getElementById('venue-grid');
     const today = new Date(); today.setHours(0, 0, 0, 0);
 
     grid.innerHTML = VENUES.map(venue => {
-      const shows = CONCERTS
+      const shows = concerts
         .filter(c => c.venueKey === venue.key && new Date(c.date) >= today)
         .sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -619,8 +659,8 @@
       if(shows.length === 0){
         return `
           <div class="venue-col">
-            <div class="venue-head"><h3>${venue.name}</h3><div class="venue-meta">${metaStr}</div></div>
-            <div class="venue-empty">No shows booked in yet for ${venue.name} — message us and we'll keep you posted.</div>
+            <div class="venue-head"><h3>${esc(venue.name)}</h3><div class="venue-meta">${metaStr}</div></div>
+            <div class="venue-empty">No shows booked in yet for ${esc(venue.name)} — message us and we'll keep you posted.</div>
           </div>`;
       }
 
@@ -635,10 +675,10 @@
       const hidden = rest.slice(LIST_CAP);
 
       const featureBg = feature.image
-        ? ` style="background-image:linear-gradient(180deg, rgba(21,22,26,0.15) 0%, rgba(21,22,26,0.92) 85%), url('${feature.image}');"`
+        ? ` style="background-image:linear-gradient(180deg, rgba(21,22,26,0.15) 0%, rgba(21,22,26,0.92) 85%), url('${esc(feature.image)}');"`
         : '';
       const featureVenueLine = venue.mode === 'mixed'
-        ? `<div class="feature-venue">${feature.venueName} · ${priceStrFor(feature.city)}</div>`
+        ? `<div class="feature-venue">${esc(feature.venueName)}${feature.venueName ? ' · ' : ''}${priceStrFor(feature.city)}</div>`
         : '';
       const featureEyebrow = venue.mode === 'mixed' ? 'Featured' : 'Next up';
 
@@ -646,7 +686,7 @@
         <a class="feature-show" href="${showWaLink(feature.artist, feature.date, feature.venueName)}"${featureBg}>
           <div class="feature-eyebrow">${featureEyebrow}</div>
           <div class="feature-date">${formatShowDate(feature.date)}</div>
-          <div class="feature-artist">${feature.artist}</div>
+          <div class="feature-artist">${esc(feature.artist)}</div>
           ${featureVenueLine}
           <div class="feature-cta">Check availability →</div>
         </a>`;
@@ -656,21 +696,21 @@
           return `
             <li><a href="${showWaLink(c.artist, c.date, c.venueName)}">
               <span class="show-date">${formatShowDate(c.date)}</span>
-              <span class="show-artist">${c.artist}<small class="show-venue">${c.venueName}</small></span>
+              <span class="show-artist">${esc(c.artist)}${c.venueName ? `<small class="show-venue">${esc(c.venueName)}</small>` : ''}</span>
               <span class="show-price">${priceStrFor(c.city)}</span>
             </a></li>`;
         }
         return `
           <li><a href="${showWaLink(c.artist, c.date, c.venueName)}">
             <span class="show-date">${formatShowDate(c.date)}</span>
-            <span class="show-artist">${c.artist}</span>
+            <span class="show-artist">${esc(c.artist)}</span>
             <span class="show-arrow">→</span>
           </a></li>`;
       };
 
       let listBodyHtml;
       if(rest.length === 0){
-        listBodyHtml = `<li class="venue-more-msg">More ${venue.name} dates to follow — message us and we'll keep you posted.</li>`;
+        listBodyHtml = `<li class="venue-more-msg">More ${esc(venue.name)} dates to follow — message us and we'll keep you posted.</li>`;
       } else {
         const visibleHtml = visible.map(rowHtml).join('');
         const hiddenHtml = hidden.map(c => rowHtml(c).replace('<li>', '<li class="show-hidden">')).join('');
@@ -682,7 +722,7 @@
 
       return `
         <div class="venue-col">
-          <div class="venue-head"><h3>${venue.name}</h3><div class="venue-meta">${metaStr}</div></div>
+          <div class="venue-head"><h3>${esc(venue.name)}</h3><div class="venue-meta">${metaStr}</div></div>
           ${featureHtml}
           <ul class="show-list">${listBodyHtml}</ul>
         </div>`;
@@ -697,7 +737,8 @@
     });
   }
 
-  renderVenues();
+  document.getElementById('venue-grid').innerHTML = '<p class="concerts-empty" style="grid-column:1/-1">Loading upcoming shows…</p>';
+  loadConcerts().then(renderVenues);
 </script>
 
 </body>

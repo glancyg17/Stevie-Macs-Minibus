@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Manage shows – Stevie Macs Mini Bus</title>
+<meta name="theme-color" content="#1F3864">
+<link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#1F3864;--navy-deep:#152A4D;--navy-light:#4C6A9C;--paper:#F5F6F7;--white:#fff;--ink:#1A1C20;--soft:#5C6168;--line:#DCDFE2;--red:#B3261E;--green:#1E7B4B;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:'Poppins',sans-serif;line-height:1.55;}
+  h1,h2,h3{font-family:'Playfair Display',serif;}
+  header{background:var(--white);border-bottom:1px solid var(--line);}
+  header .in{max-width:760px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-weight:800;}
+  .brand img{height:44px;width:44px;}
+  main{max-width:760px;margin:0 auto;padding:24px 20px 80px;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px;margin-bottom:22px;}
+  .card h2{font-size:1.25rem;margin-bottom:6px;}
+  .hint{color:var(--soft);font-size:.85rem;margin-bottom:14px;}
+  label{display:block;font-weight:600;font-size:.85rem;margin:14px 0 4px;}
+  input[type=text],input[type=email],input[type=password],input[type=date],select{
+    width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:1rem;background:var(--white);color:var(--ink);}
+  input:focus,select:focus{outline:2px solid var(--navy-light);outline-offset:1px;}
+  .check{display:flex;gap:10px;align-items:center;margin-top:14px;font-weight:500;font-size:.92rem;}
+  .check input{width:20px;height:20px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.row2{grid-template-columns:1fr;}}
+  button,.btn{font:inherit;font-weight:600;border-radius:8px;border:1px solid var(--navy);cursor:pointer;padding:11px 18px;font-size:.92rem;}
+  .primary{background:linear-gradient(180deg,var(--navy-light),var(--navy) 60%,var(--navy-deep));color:#fff;}
+  .ghost{background:var(--white);color:var(--navy);}
+  .danger{background:var(--white);color:var(--red);border-color:#E3B5B2;}
+  button:disabled{opacity:.55;cursor:default;}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+  .msg{margin-top:14px;padding:10px 12px;border-radius:8px;font-size:.9rem;display:none;}
+  .msg.err{display:block;background:#FCEBEA;color:var(--red);}
+  .msg.ok{display:block;background:#E7F5EE;color:var(--green);}
+  .note{background:#EEF2F8;border-left:3px solid var(--navy-light);padding:10px 12px;font-size:.84rem;color:var(--ink);border-radius:4px;margin-bottom:6px;}
+  .show{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);}
+  .show:last-child{border-bottom:none;}
+  .show .d{font-size:.78rem;color:var(--soft);}
+  .show .t{font-weight:600;}
+  .show .v{font-size:.8rem;color:var(--soft);}
+  .show .b{display:flex;gap:8px;flex-shrink:0;}
+  .show .b button{padding:7px 12px;font-size:.82rem;}
+  .thumb{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--line);flex-shrink:0;}
+  .past .t,.past .d{opacity:.6;}
+  .preview{margin-top:10px;display:none;gap:12px;align-items:center;}
+  .preview img{width:96px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line);}
+  details summary{cursor:pointer;font-weight:600;color:var(--navy);padding:6px 0;}
+  .hidden{display:none !important;}
+  .tiny{font-size:.78rem;color:var(--soft);}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="brand"><img src="../assets/images/sm-logo.png" alt=""><span>Manage shows</span></div>
+  <div><button id="signout" class="ghost hidden" type="button">Sign out</button></div>
+</div></header>
+
+<main>
+  <!-- LOGIN -->
+  <section id="login" class="card hidden">
+    <h2>Sign in</h2>
+    <p class="hint">This page is for managing the shows on the Stevie Macs website.</p>
+    <label for="lu">Username</label>
+    <input id="lu" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label for="lp">Password</label>
+    <input id="lp" type="password" autocomplete="current-password">
+    <div class="actions"><button id="loginbtn" class="primary" type="button">Sign in</button></div>
+    <div id="loginmsg" class="msg"></div>
+  </section>
+
+  <!-- APP -->
+  <div id="app" class="hidden">
+    <section class="card">
+      <h2 id="formtitle">Add a show</h2>
+      <div class="note">Only add a show once it's on the venue's or promoter's own website. Please don't guess dates.</div>
+
+      <label for="f-title">Show name</label>
+      <input id="f-title" type="text" maxlength="200" placeholder="e.g. Artist name, tour name">
+
+      <div class="row2">
+        <div><label for="f-date">Date</label><input id="f-date" type="date"></div>
+        <div><label for="f-where">Where</label>
+          <select id="f-where">
+            <option value="hydro">OVO Hydro (Glasgow)</option>
+            <option value="hampden">Hampden Park (Glasgow)</option>
+            <option value="other">Somewhere else</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="otherfields" class="hidden">
+        <div class="row2">
+          <div><label for="f-venue">Venue</label><input id="f-venue" type="text" maxlength="120" placeholder="e.g. Murrayfield Stadium"></div>
+          <div><label for="f-city">City</label><input id="f-city" type="text" maxlength="60" list="cities" placeholder="e.g. Edinburgh"></div>
+        </div>
+        <datalist id="cities"><option value="Glasgow"><option value="Edinburgh"><option value="Aberdeen"><option value="Dundee"><option value="Inverness"></datalist>
+        <p class="tiny" style="margin-top:6px">Glasgow shows display £15pp return and Edinburgh £30pp return. Any other city shows "Message for price".</p>
+        <label class="check"><input id="f-featured" type="checkbox"> Make this the big featured show in "Other Events"</label>
+      </div>
+
+      <label for="f-photo">Photo (optional)</label>
+      <input id="f-photo" type="file" accept="image/*">
+      <p class="tiny" style="margin-top:6px">Landscape photos work best. Only use pictures you're allowed to use. It's resized automatically.</p>
+      <div id="preview" class="preview"><img id="previewimg" alt=""><button id="rmphoto" class="ghost" type="button">Remove photo</button></div>
+
+      <div class="actions">
+        <button id="save" class="primary" type="button">Add show</button>
+        <button id="cancel" class="ghost hidden" type="button">Cancel</button>
+      </div>
+      <div id="formmsg" class="msg"></div>
+    </section>
+
+    <section class="card">
+      <h2>Upcoming shows</h2>
+      <p class="hint">These appear on the website within a few seconds. Past shows hide themselves.</p>
+      <div id="upcoming"></div>
+      <details style="margin-top:14px"><summary>Past shows</summary><div id="past"></div></details>
+    </section>
+
+    <section class="card">
+      <h2>Change password</h2>
+      <label for="np">New password (at least 10 characters)</label>
+      <input id="np" type="password" autocomplete="new-password">
+      <div class="actions"><button id="pwbtn" class="ghost" type="button">Change password</button></div>
+      <div id="pwmsg" class="msg"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  const SB_URL = 'https://vdlxjdhbwtcildvxfvxm.supabase.co';
+  const SB_KEY = 'sb_publishable_anjGUMcHq6xB4oIIhvuPFQ_40ccOn8t';
+  const SITE_ID = '02dfb9d4-86e1-4aad-aea2-5bc9b05e10e7';
+  // Typing "Stevie" (no @) signs in as this account. Supabase itself signs in by email.
+  const USERNAME_TO_EMAIL = { stevie: 'steviemacsminibus@gmail.com' };
+  const STORE = 'sm_admin_session';   // kept only on this admin page so he stays signed in
+
+  const $ = id => document.getElementById(id);
+  let session = null, shows = [], editing = null, photo = { blob: null, existing: null, removed: false };
+
+  // ---------- helpers ----------
+  function msg(id, text, kind){ const e = $(id); e.textContent = text || ''; e.className = 'msg' + (text ? ' ' + (kind || 'err') : ''); }
+  function el(tag, props, kids){
+    const e = document.createElement(tag);
+    Object.entries(props || {}).forEach(([k, v]) => { if(k === 'text') e.textContent = v; else if(k === 'class') e.className = v; else e.setAttribute(k, v); });
+    (kids || []).forEach(k => e.appendChild(k));
+    return e;
+  }
+  const fmt = d => new Date(d + 'T12:00').toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  const todayIso = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; };
+  const imgUrl = p => `${SB_URL}/storage/v1/object/public/site-images/${p}`;
+  const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c === 'x' ? r : (r&3|8)).toString(16); }));
+
+  // ---------- session ----------
+  function saveSession(s){ session = s; try{ localStorage.setItem(STORE, JSON.stringify({ refresh_token: s.refresh_token })); }catch(e){} }
+  function clearSession(){ session = null; try{ localStorage.removeItem(STORE); }catch(e){} }
+  async function authCall(path, body, method){
+    const res = await fetch(`${SB_URL}/auth/v1/${path}`, {
+      method: method || 'POST',
+      headers: { apikey: SB_KEY, 'Content-Type': 'application/json', ...(session && method === 'PUT' ? { Authorization: 'Bearer ' + session.access_token } : {}) },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok) throw new Error(data.msg || data.error_description || data.message || 'Something went wrong');
+    return data;
+  }
+  async function refresh(){
+    let rt = null;
+    try{ rt = (JSON.parse(localStorage.getItem(STORE) || 'null') || {}).refresh_token; }catch(e){}
+    if(!rt) return false;
+    try{ saveSession(await authCall('token?grant_type=refresh_token', { refresh_token: rt })); return true; }
+    catch(e){ clearSession(); return false; }
+  }
+  // Authenticated request to Supabase; retries once after refreshing an expired token.
+  async function api(path, opts, retried){
+    const o = opts || {};
+    const res = await fetch(SB_URL + path, {
+      method: o.method || 'GET',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + session.access_token, ...(o.headers || {}) },
+      body: o.body
+    });
+    if(res.status === 401 && !retried && await refresh()) return api(path, opts, true);
+    if(res.status === 401){ showLogin('Please sign in again.'); throw new Error('Signed out'); }
+    if(!res.ok){ const t = await res.text(); throw new Error(t.length < 300 ? t : 'Request failed'); }
+    return res;
+  }
+
+  // ---------- login ----------
+  function showLogin(note){ $('app').classList.add('hidden'); $('signout').classList.add('hidden'); $('login').classList.remove('hidden'); if(note) msg('loginmsg', note); }
+  function showApp(){ $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('signout').classList.remove('hidden'); loadShows(); }
+  async function doLogin(){
+    const u = $('lu').value.trim(), p = $('lp').value;
+    if(!u || !p){ msg('loginmsg', 'Enter your username and password.'); return; }
+    const email = u.includes('@') ? u : (USERNAME_TO_EMAIL[u.toLowerCase()] || '');
+    if(!email){ msg('loginmsg', "That username or password isn't right."); return; }
+    $('loginbtn').disabled = true; msg('loginmsg', '');
+    try{ saveSession(await authCall('token?grant_type=password', { email, password: p })); $('lp').value = ''; showApp(); }
+    catch(e){ msg('loginmsg', "That username or password isn't right."); }
+    $('loginbtn').disabled = false;
+  }
+
+  // ---------- shows ----------
+  async function loadShows(){
+    try{
+      const res = await api(`/rest/v1/concerts?site_id=eq.${SITE_ID}&select=*&order=show_date.asc`);
+      shows = await res.json();
+      renderShows();
+    }catch(e){ if(e.message !== 'Signed out') msg('formmsg', "Couldn't load the shows. Check your connection and refresh."); }
+  }
+  function whereLabel(s){
+    if(s.venue_key === 'hydro') return 'OVO Hydro, Glasgow';
+    if(s.venue_key === 'hampden') return 'Hampden Park, Glasgow';
+    return [s.venue_name, s.city].filter(Boolean).join(', ') || 'Somewhere else';
+  }
+  function rowFor(s, isPast){
+    const info = el('div', { style: 'flex:1;min-width:0' }, [
+      el('div', { class: 'd', text: fmt(s.show_date) + (s.featured ? ' · Featured' : '') }),
+      el('div', { class: 't', text: s.title }),
+      el('div', { class: 'v', text: whereLabel(s) })
+    ]);
+    const kids = [];
+    if(s.image_path) kids.push(el('img', { class: 'thumb', src: imgUrl(s.image_path), alt: '' }));
+    kids.push(info);
+    const edit = el('button', { class: 'ghost', type: 'button', text: 'Edit' });
+    const del = el('button', { class: 'danger', type: 'button', text: 'Delete' });
+    edit.addEventListener('click', () => startEdit(s));
+    del.addEventListener('click', () => removeShow(s));
+    kids.push(el('div', { class: 'b' }, [edit, del]));
+    return el('div', { class: 'show' + (isPast ? ' past' : '') }, kids);
+  }
+  function renderShows(){
+    const t = todayIso();
+    const up = $('upcoming'), past = $('past');
+    up.replaceChildren(); past.replaceChildren();
+    const upcoming = shows.filter(s => s.show_date >= t), old = shows.filter(s => s.show_date < t).reverse();
+    if(!upcoming.length) up.appendChild(el('p', { class: 'hint', text: 'No upcoming shows yet. Add one above.' }));
+    upcoming.forEach(s => up.appendChild(rowFor(s, false)));
+    if(!old.length) past.appendChild(el('p', { class: 'hint', text: 'Nothing here yet.' }));
+    old.forEach(s => past.appendChild(rowFor(s, true)));
+  }
+  function syncWhere(){ $('otherfields').classList.toggle('hidden', $('f-where').value !== 'other'); }
+  function resetForm(){
+    editing = null; photo = { blob: null, existing: null, removed: false };
+    ['f-title','f-date','f-venue','f-city'].forEach(i => $(i).value = '');
+    $('f-where').value = 'hydro'; $('f-featured').checked = false; $('f-photo').value = '';
+    $('preview').style.display = 'none'; $('formtitle').textContent = 'Add a show'; $('save').textContent = 'Add show';
+    $('cancel').classList.add('hidden'); syncWhere(); msg('formmsg', '');
+  }
+  function startEdit(s){
+    editing = s; photo = { blob: null, existing: s.image_path || null, removed: false };
+    $('f-title').value = s.title; $('f-date').value = s.show_date; $('f-where').value = s.venue_key;
+    $('f-venue').value = s.venue_name || ''; $('f-city').value = s.city || ''; $('f-featured').checked = !!s.featured;
+    $('f-photo').value = ''; syncWhere(); showPreview(s.image_path ? imgUrl(s.image_path) : null);
+    $('formtitle').textContent = 'Edit show'; $('save').textContent = 'Save changes'; $('cancel').classList.remove('hidden');
+    msg('formmsg', ''); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function showPreview(url){ const p = $('preview'); if(url){ $('previewimg').src = url; p.style.display = 'flex'; } else { p.style.display = 'none'; } }
+
+  // Resize to max 1600px wide JPEG, under ~1.9 MB (the upload limit is 2 MB)
+  function toJpeg(file){
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = async () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, 1600 / img.width), w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+        for(const q of [0.85, 0.75, 0.65, 0.5]){
+          const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+          if(blob && blob.size <= 1.9 * 1024 * 1024) return resolve(blob);
+        }
+        reject(new Error('That photo is too big. Try a smaller one.'));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("That file doesn't look like a photo.")); };
+      img.src = url;
+    });
+  }
+  async function deleteImage(path){ if(!path) return; try{ await api(`/storage/v1/object/site-images/${path}`, { method: 'DELETE' }); }catch(e){} }
+
+  async function saveShow(){
+    const title = $('f-title').value.trim(), date = $('f-date').value, where = $('f-where').value;
+    if(!title){ msg('formmsg', 'Add the show name.'); return; }
+    if(!date){ msg('formmsg', 'Pick the date.'); return; }
+    const venue = $('f-venue').value.trim(), city = $('f-city').value.trim();
+    if(where === 'other' && (!venue || !city)){ msg('formmsg', 'For "Somewhere else", add the venue and the city.'); return; }
+
+    $('save').disabled = true; msg('formmsg', 'Saving…', 'ok');
+    let uploaded = null;
+    try{
+      let image_path = photo.removed ? null : photo.existing;
+      if(photo.blob){
+        uploaded = `${SITE_ID}/${uuid()}.jpg`;
+        await api(`/storage/v1/object/site-images/${uploaded}`, { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: photo.blob });
+        image_path = uploaded;
+      }
+      const row = { title, show_date: date, venue_key: where,
+        venue_name: where === 'other' ? venue : null, city: where === 'other' ? city : null,
+        featured: where === 'other' ? $('f-featured').checked : false, image_path };
+      const json = { 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+      if(editing){
+        await api(`/rest/v1/concerts?id=eq.${editing.id}`, { method: 'PATCH', headers: json, body: JSON.stringify(row) });
+        if(editing.image_path && editing.image_path !== image_path) await deleteImage(editing.image_path);
+      } else {
+        await api('/rest/v1/concerts', { method: 'POST', headers: json, body: JSON.stringify({ ...row, site_id: SITE_ID }) });
+      }
+      const wasEdit = !!editing;
+      resetForm(); await loadShows();
+      msg('formmsg', wasEdit ? 'Saved. It’s updated on the website.' : 'Added. It’s now on the website.', 'ok');
+    }catch(e){
+      if(uploaded) await deleteImage(uploaded);
+      if(e.message !== 'Signed out') msg('formmsg', "Couldn't save that. Check the details and try again.");
+    }
+    $('save').disabled = false;
+  }
+  async function removeShow(s){
+    if(!confirm(`Delete "${s.title}" on ${fmt(s.show_date)}?`)) return;
+    try{
+      await api(`/rest/v1/concerts?id=eq.${s.id}`, { method: 'DELETE' });
+      await deleteImage(s.image_path);
+      if(editing && editing.id === s.id) resetForm();
+      await loadShows();
+    }catch(e){ if(e.message !== 'Signed out') msg('formmsg', "Couldn't delete that. Try again."); }
+  }
+  async function changePassword(){
+    const np = $('np').value;
+    if(np.length < 10){ msg('pwmsg', 'Use at least 10 characters.'); return; }
+    $('pwbtn').disabled = true;
+    try{ await authCall('user', { password: np }, 'PUT'); $('np').value = ''; msg('pwmsg', 'Password changed.', 'ok'); }
+    catch(e){ msg('pwmsg', e.message); }
+    $('pwbtn').disabled = false;
+  }
+
+  // ---------- wire up ----------
+  $('loginbtn').addEventListener('click', doLogin);
+  $('lp').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+  $('signout').addEventListener('click', () => { clearSession(); resetForm(); showLogin(); });
+  $('f-where').addEventListener('change', syncWhere);
+  $('save').addEventListener('click', saveShow);
+  $('cancel').addEventListener('click', resetForm);
+  $('pwbtn').addEventListener('click', changePassword);
+  $('rmphoto').addEventListener('click', () => { photo.blob = null; photo.removed = true; $('f-photo').value = ''; showPreview(null); });
+  $('f-photo').addEventListener('change', async () => {
+    const f = $('f-photo').files[0]; if(!f) return;
+    try{ photo.blob = await toJpeg(f); photo.removed = false; showPreview(URL.createObjectURL(photo.blob)); msg('formmsg', ''); }
+    catch(e){ $('f-photo').value = ''; msg('formmsg', e.message); }
+  });
+  syncWhere();
+  refresh().then(ok => ok ? showApp() : showLogin());
+})();
+</script>
+</body>
+</html>

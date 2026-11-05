@@ -26,6 +26,7 @@ GitHub Pages from the repo root, custom domain `steviemacsminibus.co.uk`. A file
 ## Repo map
 ```
 index.html          the whole site (CSS + JS inline, self-contained)
+admin/index.html    client's show manager (Supabase login; noindex)
 404.html            branded error page (noindex)
 robots.txt          allows all crawlers incl. AI bots, points at sitemap
 sitemap.xml         single URL; update <lastmod> when the page meaningfully changes
@@ -73,16 +74,25 @@ Concert/fixture dates must be **verified against the venue's or organiser's own 
 - Chris Stapleton has **no** confirmed 2026 Hydro date (last played Oct 2024) → his photo is unused.
 - "Connect Music Festival" could **not** be confirmed for 2026 (dormant since 2023) → not listed. The real Royal Highland Centre series is "Edinburgh Summer Sessions".
 - Scotland play some Nations League games **away** (Slovenia 26 Sep, North Macedonia 3 Oct, Switzerland 16 Nov) — those are not at Hampden and are deliberately excluded.
-Data was last verified during the August 2026 build. The page hides past dates automatically, so stale data just disappears — but re-check sources before adding or refreshing.
+Data was last verified during the August 2026 build. The page hides past dates automatically, so stale data just disappears. **From Nov 2026 the live list is maintained by the client at /admin/** (see below), so he is now the one confirming dates; the same rule applies to him: only add a show once it's on the venue's or promoter's own listing.
 
 ## Concert section mechanics (bottom `<script>` of index.html)
-- `VENUES`: three columns. `mode:'single'` (Hydro, Hampden): one venue/city, price shown once in the column header. `mode:'mixed'` (Other Events): each entry carries its own `venueName` + `city`; price shown per row via `CITY_FARES`, else "Message for price".
-- `CONCERTS` entry: `{ artist, venueKey, venueName, city, date:'YYYY-MM-DD', image?, featured? }`.
-- Feature block = soonest upcoming show for single columns; for the mixed column the entry with `featured:true` (currently Bon Jovi at Murrayfield). Feature `image` renders as a background photo with a dark gradient.
-- `LIST_CAP = 7`: list shows 7 rows, then a "Load N more" row reveals the rest. A column with a feature but no other shows displays "More … dates to follow".
+**Data source: the `concerts` table in Supabase, managed by the client at `/admin/`** (added Nov 2026; replaced the hard-coded array). The public page only *reads* it with the publishable key (`SB_KEY`, safe to be public; row-level security blocks all writes without a login). `SB_SITE_ID` scopes the query to this client's rows. If the request fails or times out (6 s), the page falls back to `FALLBACK_CONCERTS` (old hard-coded list; past dates hide themselves). A successful but empty response correctly shows "no shows booked yet".
+
+**Never put passwords, the service-role key or any account details in this repo.** The client's login is managed in the Supabase dashboard (Authentication → Users) and `site_members` (role `owner` for site `stevie-macs`); the admin page maps the username "stevie" to his email via `USERNAME_TO_EMAIL`.
+
+**`/admin/index.html`** (noindex, not in the sitemap, no libraries): sign in → add/edit/delete shows → optional photo → change own password. Photos are resized in the browser to ≤1600px JPEG (<1.9 MB), uploaded to the shared public bucket `site-images` under `<site_id>/<uuid>.jpg` (bucket limit 2 MB, JPEG only; owner-only write per site). The table has an `image_path` CHECK so a row can only point at its own site's folder. Deleting/replacing a show removes the old photo. The admin page keeps a refresh token in `localStorage` (admin only; the public page stays storage-free).
+
+**Table `concerts`**: `site_id, show_date, title, venue_key ('hydro'|'hampden'|'other'), venue_name, city, featured, image_path`. RLS: public SELECT; INSERT/UPDATE/DELETE only for members of the site (`private.is_member`). Triggers reuse `private.lists_guard` and `private.touch_updated_at`. Hydro/Hampden rows ignore venue/city (filled from `VENUES`); only `other` uses them.
+
+**Rendering** (unchanged logic): `VENUES` = three columns. `mode:'single'` (Hydro, Hampden): one venue/city, price in the column header. `mode:'mixed'` (Other Events): each entry has its own `venueName` + `city`, price per row via `CITY_FARES` (Glasgow £15, Edinburgh £30, else "Message for price").
+- Feature block = soonest upcoming show for single columns; for the mixed column the `featured` entry, else the soonest.
+- `LIST_CAP = 7`: 7 rows, then "Load N more". A column with a feature but no other shows displays "More … dates to follow".
 - Every row/feature links to WhatsApp with a pre-filled "check availability for {artist} at {venue} on {date}" message.
-- Multi-day events (e.g. Edinburgh International Festival) are one row dated on the start date, with the range in `venueName`.
-- Hampden is mostly football; the section is effectively "big event transport", so non-music entries are fine if verified.
+- Multi-day events are one row dated on the start date, with the range in the venue field.
+- All text from the database is HTML-escaped before rendering.
+- The page makes one request to `*.supabase.co` on load (publishable key, no cookies). Mention if the privacy position ever matters.
+- Hampden is mostly football; non-music entries are fine if verified.
 
 ## Hero carousel mechanics
 - `HERO_IMAGES` (src + descriptive alt) → three `.hero-carousel-item`s assigned to `slot-left/center/right`; rotates every **2700 ms**; skipped if `prefers-reduced-motion`.
@@ -100,7 +110,8 @@ Keyword-first title ("Concert Transport & Airport Transfers – Stevie Macs Mini
 - Add booking terms (deposit/cancellation/late-night surcharge) to the page if the client wants them visible.
 - `README.md` is outdated.
 - Submit `sitemap.xml` in Google Search Console once live; set up a Google Business Profile.
-- Unused concert photos (Stapleton, Take That, Metallica) can be wired in only when a real date is confirmed.
+- Unused concert photos (Stapleton, Take That, Metallica) are in the repo; the client can upload photos himself via /admin/, so only reuse these once a real date is confirmed.
+- Client's Supabase login must be created and added to `site_members` (see above) before /admin/ works.
 
 ## Working rules for Claude
 - When asked for "just index.html", deliver the complete, self-contained file — don't paste fragments.
